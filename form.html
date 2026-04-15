@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Green's Technology – Velachery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:  #16a34a;
+      --green-d:#14532d;
+      --green-l:#dcfce7;
+      --ink:    #0f172a;
+      --muted:  #64748b;
+      --bg:     #f8fafc;
+      --card:   #ffffff;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--green-d);
+      color: #fff;
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-dot {
+      width: 32px; height: 32px;
+      background: var(--green);
+      border-radius: 8px;
+      display: grid; place-items: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 18px; color: #fff;
+    }
+    header span { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: .3px; }
+
+    /* ── Hero ── */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 24px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--green-l); color: var(--green-d);
+      font-size: 12px; font-weight: 500; letter-spacing: .5px;
+      padding: 5px 14px; border-radius: 999px;
+      margin-bottom: 28px;
+      text-transform: uppercase;
+    }
+    .badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); display:block; }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--ink);
+      max-width: 680px;
+      margin-bottom: 18px;
+    }
+    h1 span { color: var(--green); }
+
+    .sub {
+      font-size: 17px; color: var(--muted); font-weight: 300;
+      max-width: 480px; line-height: 1.6; margin-bottom: 40px;
+    }
+
+    .cta-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+    .btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px; font-weight: 500;
+      padding: 13px 28px; border-radius: var(--radius);
+      border: none; cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+    .btn-primary { background: var(--green); color: #fff; }
+    .btn-primary:hover { background: var(--green-d); }
+    .btn-outline { background: transparent; color: var(--ink); border: 1.5px solid #cbd5e1; }
+
+    /* ── Stats row ── */
+    .stats {
+      display: flex; gap: 0; justify-content: center;
+      margin-top: 64px; border-top: 1px solid #e2e8f0;
+      padding-top: 40px;
+    }
+    .stat { padding: 0 40px; text-align: center; border-right: 1px solid #e2e8f0; }
+    .stat:last-child { border-right: none; }
+    .stat-n { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--green); }
+    .stat-l { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; font-size: 13px; color: var(--muted);
+      padding: 20px; border-top: 1px solid #e2e8f0;
+    }
+
+    @media (max-width: 520px) {
+      .stats { flex-direction: column; gap: 24px; }
+      .stat { border-right: none; padding: 0; }
+      header { padding: 14px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-dot">G</div>
+    <span>Green's Technology</span>
+  </header>
+
+  <section class="hero">
+    <div class="badge">Velachery, Chennai</div>
+
+    <h1>Welcome to<br/><span>Green's Technology</span></h1>
+
+    <p class="sub">
+      Professional IT training and placement with hands-on DevOps,
+      Cloud &amp; Full-Stack programs designed for real-world careers.
+    </p>
+
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="alert('Hello! Welcome to Green\'s Technology 👋')">
+        Say Hello
+      </button>
+      <a class="btn btn-outline" href="/health">Check App Health</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-n">500+</div><div class="stat-l">Students Placed</div></div>
+      <div class="stat"><div class="stat-n">10+</div><div class="stat-l">Years Experience</div></div>
+      <div class="stat"><div class="stat-n">30+</div><div class="stat-l">Courses Offered</div></div>
+    </div>
+  </section>
+
+  <footer>
+    &copy; 2025 Green's Technology, Velachery &nbsp;·&nbsp; Deployed via Jenkins CI/CD on Kubernetes
+  </footer>
+
+</body>
+</html>

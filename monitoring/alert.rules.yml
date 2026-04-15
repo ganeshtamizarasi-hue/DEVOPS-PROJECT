@@ -1,0 +1,56 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# alert.rules.yml  –  Prometheus alerting rules
+# ─────────────────────────────────────────────────────────────────────────────
+
+groups:
+
+  - name: node_alerts
+    rules:
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 80% for more than 2 minutes. Current: {{ $value }}%"
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 85%. Current: {{ $value }}%"
+
+      - alert: DiskSpaceLow
+        expr: (1 - (node_filesystem_free_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100 > 80
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Disk {{ $labels.mountpoint }} is {{ $value }}% full."
+
+  - name: app_alerts
+    rules:
+
+      - alert: AppDown
+        expr: up{job="fastapi-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "FastAPI application is DOWN"
+          description: "The FastAPI app has been unreachable for more than 1 minute."
+
+      - alert: JenkinsDown
+        expr: up{job="jenkins"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Jenkins is DOWN"
+          description: "Jenkins has been unreachable for more than 2 minutes."

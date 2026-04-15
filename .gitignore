@@ -1,0 +1,34 @@
+# Terraform — NEVER commit real values
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
+terraform/tfplan
+terraform/crash.log
+*.tfstate*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Secrets
+.env
+*.pem
+*.ppk
+*.key
+
+# Jenkins workspace artifacts
+deploy-final.yaml
+trivy-report.txt
+report.txt
+
+# OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

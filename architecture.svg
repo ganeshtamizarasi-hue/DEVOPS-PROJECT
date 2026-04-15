@@ -1,0 +1,264 @@
+<svg viewBox="0 0 1000 680" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',system-ui,sans-serif">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0f1e"/>
+      <stop offset="100%" style="stop-color:#0d1b35"/>
+    </linearGradient>
+
+    <!-- Card gradients -->
+    <linearGradient id="gDev" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a5f"/>
+      <stop offset="100%" style="stop-color:#162d4a"/>
+    </linearGradient>
+    <linearGradient id="gJenkins" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2f1a"/>
+      <stop offset="100%" style="stop-color:#122212"/>
+    </linearGradient>
+    <linearGradient id="gAWS" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d1f0a"/>
+      <stop offset="100%" style="stop-color:#1f1505"/>
+    </linearGradient>
+    <linearGradient id="gK8s" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d2038"/>
+      <stop offset="100%" style="stop-color:#081828"/>
+    </linearGradient>
+    <linearGradient id="gMon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1030"/>
+      <stop offset="100%" style="stop-color:#100a22"/>
+    </linearGradient>
+
+    <!-- Glow filters -->
+    <filter id="glowBlue" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="glowGreen">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+
+    <!-- Arrow markers -->
+    <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#3b82f6"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#10b981"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#f59e0b"/>
+    </marker>
+    <marker id="arrowPurple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#8b5cf6"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="680" fill="url(#bg)"/>
+
+  <!-- Subtle grid pattern -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-width="0.15" opacity="0.08"/>
+  </pattern>
+  <rect width="1000" height="680" fill="url(#grid)"/>
+
+  <!-- ── TITLE ── -->
+  <text x="500" y="36" text-anchor="middle" font-size="20" font-weight="700" fill="#e2e8f0" letter-spacing="1">AWS DevOps CI/CD Pipeline — Architecture</text>
+  <text x="500" y="56" text-anchor="middle" font-size="11" fill="#64748b" letter-spacing="2">GREEN'S TECHNOLOGY · VELACHERY · AP-SOUTH-1 (MUMBAI)</text>
+  <line x1="80" y1="66" x2="920" y2="66" stroke="#1e3a5f" stroke-width="1"/>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ROW 1: Developer → GitHub → Jenkins EC2
+  ════════════════════════════════════════════════════════════ -->
+
+  <!-- DEVELOPER BOX -->
+  <rect x="30" y="88" width="130" height="84" rx="10" fill="url(#gDev)" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="95" y="114" text-anchor="middle" font-size="22">💻</text>
+  <text x="95" y="134" text-anchor="middle" font-size="12" font-weight="700" fill="#93c5fd">Developer</text>
+  <text x="95" y="150" text-anchor="middle" font-size="10" fill="#60a5fa">Windows Laptop</text>
+  <text x="95" y="163" text-anchor="middle" font-size="10" fill="#60a5fa">PuTTY / Git Bash</text>
+
+  <!-- Arrow Dev → GitHub -->
+  <line x1="160" y1="130" x2="218" y2="130" stroke="#3b82f6" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#arrowBlue)"/>
+  <text x="189" y="123" text-anchor="middle" font-size="9" fill="#60a5fa">git push</text>
+
+  <!-- GITHUB BOX -->
+  <rect x="220" y="88" width="130" height="84" rx="10" fill="url(#gDev)" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="285" y="114" text-anchor="middle" font-size="22">🐙</text>
+  <text x="285" y="134" text-anchor="middle" font-size="12" font-weight="700" fill="#93c5fd">GitHub</text>
+  <text x="285" y="150" text-anchor="middle" font-size="10" fill="#60a5fa">Source Code</text>
+  <text x="285" y="163" text-anchor="middle" font-size="10" fill="#60a5fa">Jenkinsfile · Dockerfile</text>
+
+  <!-- Arrow GitHub → Jenkins -->
+  <line x1="350" y1="130" x2="408" y2="130" stroke="#10b981" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+  <text x="379" y="123" text-anchor="middle" font-size="9" fill="#34d399">trigger</text>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       JENKINS EC2 BIG BOX
+  ════════════════════════════════════════════════════════════ -->
+  <rect x="408" y="76" width="434" height="310" rx="12" fill="#0c1a0c" stroke="#16a34a" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="408" y="76" width="434" height="28" rx="12" fill="#166534"/>
+  <rect x="408" y="92" width="434" height="12" fill="#166534"/>
+  <text x="472" y="95" font-size="11" font-weight="700" fill="#bbf7d0" letter-spacing="1">EC2 · Ubuntu 22.04 · t3.large · ap-south-1</text>
+  <text x="830" y="95" text-anchor="end" font-size="10" fill="#86efac">Port map →</text>
+
+  <!-- Jenkins inside EC2 -->
+  <rect x="420" y="114" width="120" height="70" rx="8" fill="#1a2f1a" stroke="#22c55e" stroke-width="1"/>
+  <text x="480" y="136" text-anchor="middle" font-size="18">⚙</text>
+  <text x="480" y="153" text-anchor="middle" font-size="11" font-weight="700" fill="#86efac">Jenkins</text>
+  <text x="480" y="167" text-anchor="middle" font-size="9" fill="#4ade80">:8080  CI/CD</text>
+  <text x="480" y="179" text-anchor="middle" font-size="9" fill="#4ade80">13 Pipeline Stages</text>
+
+  <!-- SonarQube inside EC2 -->
+  <rect x="556" y="114" width="120" height="70" rx="8" fill="#1a1f2f" stroke="#3b82f6" stroke-width="1"/>
+  <text x="616" y="136" text-anchor="middle" font-size="18">🔍</text>
+  <text x="616" y="153" text-anchor="middle" font-size="11" font-weight="700" fill="#93c5fd">SonarQube</text>
+  <text x="616" y="167" text-anchor="middle" font-size="9" fill="#60a5fa">:9000  SAST</text>
+  <text x="616" y="179" text-anchor="middle" font-size="9" fill="#60a5fa">Quality Gate</text>
+
+  <!-- Trivy inside EC2 -->
+  <rect x="692" y="114" width="136" height="70" rx="8" fill="#2d1515" stroke="#ef4444" stroke-width="1"/>
+  <text x="760" y="136" text-anchor="middle" font-size="18">🛡</text>
+  <text x="760" y="153" text-anchor="middle" font-size="11" font-weight="700" fill="#fca5a5">Trivy</text>
+  <text x="760" y="167" text-anchor="middle" font-size="9" fill="#f87171">Image Scanner</text>
+  <text x="760" y="179" text-anchor="middle" font-size="9" fill="#f87171">CVE Detection</text>
+
+  <!-- Docker inside EC2 -->
+  <rect x="420" y="198" width="120" height="70" rx="8" fill="#0d1f2d" stroke="#06b6d4" stroke-width="1"/>
+  <text x="480" y="220" text-anchor="middle" font-size="18">🐳</text>
+  <text x="480" y="237" text-anchor="middle" font-size="11" font-weight="700" fill="#67e8f9">Docker</text>
+  <text x="480" y="251" text-anchor="middle" font-size="9" fill="#22d3ee">Build Images</text>
+  <text x="480" y="263" text-anchor="middle" font-size="9" fill="#22d3ee">Multi-stage</text>
+
+  <!-- Prometheus inside EC2 -->
+  <rect x="556" y="198" width="120" height="70" rx="8" fill="#2d1a0a" stroke="#f59e0b" stroke-width="1"/>
+  <text x="616" y="220" text-anchor="middle" font-size="18">📊</text>
+  <text x="616" y="237" text-anchor="middle" font-size="11" font-weight="700" fill="#fcd34d">Prometheus</text>
+  <text x="616" y="251" text-anchor="middle" font-size="9" fill="#fbbf24">:9090  Metrics</text>
+  <text x="616" y="263" text-anchor="middle" font-size="9" fill="#fbbf24">Node Exporter</text>
+
+  <!-- Grafana inside EC2 -->
+  <rect x="692" y="198" width="136" height="70" rx="8" fill="#1a0d2d" stroke="#8b5cf6" stroke-width="1"/>
+  <text x="760" y="220" text-anchor="middle" font-size="18">📈</text>
+  <text x="760" y="237" text-anchor="middle" font-size="11" font-weight="700" fill="#c4b5fd">Grafana</text>
+  <text x="760" y="251" text-anchor="middle" font-size="9" fill="#a78bfa">:3000  Dashboards</text>
+  <text x="760" y="263" text-anchor="middle" font-size="9" fill="#a78bfa">Alerts</text>
+
+  <!-- Terraform inside EC2 (bottom strip) -->
+  <rect x="420" y="282" width="408" height="90" rx="8" fill="#0a1a0a" stroke="#16a34a" stroke-width="0.8" stroke-dasharray="4,2"/>
+  <text x="436" y="300" font-size="10" font-weight="700" fill="#4ade80">🏗  TERRAFORM  —  Provisions all AWS infrastructure</text>
+  <text x="436" y="318" font-size="9" fill="#6b7280">VPC  ·  Subnets  ·  Internet Gateway  ·  Security Groups</text>
+  <text x="436" y="334" font-size="9" fill="#6b7280">IAM Roles  ·  ECR Repository  ·  S3 State Bucket  ·  DynamoDB Lock</text>
+  <text x="436" y="350" font-size="9" fill="#6b7280">EC2 Elastic IP  ·  Route Tables  ·  Lifecycle Policies</text>
+  <text x="800" y="324" text-anchor="middle" font-size="9" fill="#4ade80">terraform</text>
+  <text x="800" y="336" text-anchor="middle" font-size="9" fill="#4ade80">init → plan</text>
+  <text x="800" y="348" text-anchor="middle" font-size="9" fill="#4ade80">→ apply</text>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ROW 2 BOTTOM: ECR  →  K8s Cluster  →  Monitoring note
+  ════════════════════════════════════════════════════════════ -->
+
+  <!-- Arrow EC2 → ECR -->
+  <line x1="625" y1="386" x2="625" y2="428" stroke="#f59e0b" stroke-width="1.8" marker-end="url(#arrowOrange)"/>
+  <text x="648" y="410" font-size="9" fill="#fbbf24">docker push</text>
+
+  <!-- AWS ECR BOX -->
+  <rect x="408" y="430" width="200" height="84" rx="10" fill="url(#gAWS)" stroke="#f59e0b" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="508" y="456" text-anchor="middle" font-size="22">📦</text>
+  <text x="508" y="476" text-anchor="middle" font-size="12" font-weight="700" fill="#fcd34d">AWS ECR</text>
+  <text x="508" y="492" text-anchor="middle" font-size="10" fill="#fbbf24">Elastic Container Registry</text>
+  <text x="508" y="506" text-anchor="middle" font-size="10" fill="#fbbf24">Private Docker Registry</text>
+
+  <!-- Arrow ECR → K8s -->
+  <line x1="608" y1="472" x2="668" y2="472" stroke="#3b82f6" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+  <text x="638" y="464" text-anchor="middle" font-size="9" fill="#60a5fa">kubectl apply</text>
+
+  <!-- KUBERNETES CLUSTER BOX -->
+  <rect x="668" y="408" width="302" height="190" rx="12" fill="url(#gK8s)" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="668" y="408" width="302" height="24" rx="12" fill="#1e3a8a"/>
+  <rect x="668" y="420" width="302" height="12" fill="#1e3a8a"/>
+  <text x="730" y="426" font-size="10" font-weight="700" fill="#bfdbfe" letter-spacing="1">KUBERNETES CLUSTER  (KOPS)</text>
+
+  <!-- K8s Deployment -->
+  <rect x="680" y="440" width="130" height="68" rx="7" fill="#0d1f38" stroke="#60a5fa" stroke-width="1"/>
+  <text x="745" y="460" text-anchor="middle" font-size="11" font-weight="700" fill="#93c5fd">Deployment</text>
+  <text x="745" y="476" text-anchor="middle" font-size="9" fill="#60a5fa">fastapi-deployment</text>
+  <text x="745" y="490" text-anchor="middle" font-size="9" fill="#60a5fa">replicas: 2</text>
+  <text x="745" y="502" text-anchor="middle" font-size="9" fill="#60a5fa">RollingUpdate</text>
+
+  <!-- K8s Service -->
+  <rect x="824" y="440" width="130" height="68" rx="7" fill="#0d1f38" stroke="#60a5fa" stroke-width="1"/>
+  <text x="889" y="460" text-anchor="middle" font-size="11" font-weight="700" fill="#93c5fd">Service</text>
+  <text x="889" y="476" text-anchor="middle" font-size="9" fill="#60a5fa">LoadBalancer</text>
+  <text x="889" y="490" text-anchor="middle" font-size="9" fill="#60a5fa">fastapi-svc</text>
+  <text x="889" y="502" text-anchor="middle" font-size="9" fill="#60a5fa">port: 80</text>
+
+  <!-- HPA -->
+  <rect x="680" y="520" width="274" height="64" rx="7" fill="#091528" stroke="#3b82f6" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="817" y="540" text-anchor="middle" font-size="10" font-weight="700" fill="#60a5fa">HPA — Horizontal Pod Autoscaler</text>
+  <text x="817" y="556" text-anchor="middle" font-size="9" fill="#3b82f6">min: 2 pods   →   max: 6 pods   |   CPU threshold: 60%</text>
+  <text x="817" y="570" text-anchor="middle" font-size="9" fill="#3b82f6">Liveness Probe  ·  Readiness Probe  ·  Resource Limits</text>
+
+  <!-- Arrow K8s → Internet user -->
+  <line x1="889" y1="508" x2="889" y2="608" stroke="#10b981" stroke-width="1.8" marker-end="url(#arrowGreen)"/>
+
+  <!-- INTERNET USER BOX -->
+  <rect x="820" y="610" width="140" height="56" rx="10" fill="#0a1a12" stroke="#10b981" stroke-width="1.2"/>
+  <text x="890" y="632" text-anchor="middle" font-size="16">🌐</text>
+  <text x="890" y="648" text-anchor="middle" font-size="11" font-weight="700" fill="#34d399">End User</text>
+  <text x="890" y="660" text-anchor="middle" font-size="9" fill="#10b981">http://LB-URL</text>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LEFT SIDE: Pipeline flow labels
+  ════════════════════════════════════════════════════════════ -->
+
+  <!-- Pipeline stages vertical label box -->
+  <rect x="30" y="192" width="370" height="276" rx="10" fill="#08101f" stroke="#1e3a5f" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="50" y="212" font-size="10" font-weight="700" fill="#3b82f6" letter-spacing="1">JENKINS PIPELINE  —  13 STAGES</text>
+
+  <text x="46" y="232" font-size="11" fill="#22c55e">①</text><text x="62" y="232" font-size="10" fill="#94a3b8">Pull Code from GitHub</text>
+  <text x="46" y="250" font-size="11" fill="#22c55e">②</text><text x="62" y="250" font-size="10" fill="#94a3b8">Terraform Init  (if RUN_TERRAFORM checked)</text>
+  <text x="46" y="268" font-size="11" fill="#22c55e">③</text><text x="62" y="268" font-size="10" fill="#94a3b8">Terraform Plan</text>
+  <text x="46" y="286" font-size="11" fill="#22c55e">④</text><text x="62" y="286" font-size="10" fill="#94a3b8">Terraform Apply</text>
+  <text x="46" y="304" font-size="11" fill="#22c55e">⑤</text><text x="62" y="304" font-size="10" fill="#94a3b8">Terraform Destroy  (manual confirm)</text>
+  <text x="46" y="322" font-size="11" fill="#22c55e">⑥</text><text x="62" y="322" font-size="10" fill="#94a3b8">SonarQube Analysis  (SAST)</text>
+  <text x="46" y="340" font-size="11" fill="#22c55e">⑦</text><text x="62" y="340" font-size="10" fill="#94a3b8">Quality Gate  (blocks on failure)</text>
+  <text x="46" y="358" font-size="11" fill="#22c55e">⑧</text><text x="62" y="358" font-size="10" fill="#94a3b8">Build Docker Image  (multi-stage)</text>
+  <text x="46" y="376" font-size="11" fill="#22c55e">⑨</text><text x="62" y="376" font-size="10" fill="#94a3b8">Trivy Image Security Scan</text>
+  <text x="46" y="394" font-size="11" fill="#22c55e">⑩</text><text x="62" y="394" font-size="10" fill="#94a3b8">Push to AWS ECR  (:build_number + :latest)</text>
+  <text x="46" y="412" font-size="11" fill="#22c55e">⑪</text><text x="62" y="412" font-size="10" fill="#94a3b8">Deploy to Kubernetes  (kubectl apply)</text>
+  <text x="46" y="430" font-size="11" fill="#22c55e">⑫</text><text x="62" y="430" font-size="10" fill="#94a3b8">Smoke Test  (curl LoadBalancer)</text>
+  <text x="46" y="448" font-size="11" fill="#22c55e">⑬</text><text x="62" y="448" font-size="10" fill="#94a3b8">Email Notification  (Gmail SMTP)</text>
+
+  <!-- Legend / monitoring row bottom left -->
+  <rect x="30" y="486" width="370" height="84" rx="10" fill="#100a22" stroke="#7c3aed" stroke-width="1"/>
+  <text x="50" y="504" font-size="10" font-weight="700" fill="#8b5cf6" letter-spacing="1">MONITORING STACK</text>
+  <text x="46" y="522" font-size="10" fill="#94a3b8">Prometheus  scrapes →  Jenkins (build metrics)</text>
+  <text x="46" y="538" font-size="10" fill="#94a3b8">                              Node Exporter (CPU, RAM, Disk)</text>
+  <text x="46" y="554" font-size="10" fill="#94a3b8">                              FastAPI app (/metrics)</text>
+  <text x="46" y="570" font-size="10" fill="#94a3b8">Grafana      dashboards → CPU%, Memory%, Disk%, App Status</text>
+
+  <!-- Legend bottom strip -->
+  <rect x="30" y="582" width="762" height="38" rx="8" fill="#0a0f1e" stroke="#1e3a5f" stroke-width="1"/>
+  <circle cx="56" cy="601" r="5" fill="#3b82f6"/>
+  <text x="68" y="605" font-size="10" fill="#94a3b8">CI/CD Flow</text>
+  <circle cx="156" cy="601" r="5" fill="#10b981"/>
+  <text x="168" y="605" font-size="10" fill="#94a3b8">Deploy / Live</text>
+  <circle cx="268" cy="601" r="5" fill="#f59e0b"/>
+  <text x="280" y="605" font-size="10" fill="#94a3b8">Image Push</text>
+  <circle cx="368" cy="601" r="5" fill="#8b5cf6"/>
+  <text x="380" y="605" font-size="10" fill="#94a3b8">Monitoring</text>
+  <circle cx="468" cy="601" r="5" fill="#ef4444"/>
+  <text x="480" y="605" font-size="10" fill="#94a3b8">Security Scan</text>
+  <circle cx="572" cy="601" r="5" fill="#22c55e"/>
+  <text x="584" y="605" font-size="10" fill="#94a3b8">Terraform IaC</text>
+  <text x="718" y="606" text-anchor="end" font-size="9" fill="#475569">ap-south-1 (Mumbai)</text>
+  <text x="786" y="606" text-anchor="end" font-size="9" fill="#475569">8–10 LPA DevOps Project</text>
+
+  <!-- Monitoring arrow from Prometheus to Jenkins (curved dashed) -->
+  <path d="M616 268 Q616 400 616 430" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,2" fill="none" opacity="0.5"/>
+
+</svg>

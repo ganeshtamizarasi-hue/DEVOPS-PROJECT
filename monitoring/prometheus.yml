@@ -1,0 +1,61 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# prometheus.yml  –  Prometheus scrape configuration
+# Deploy location on EC2: /opt/prometheus/prometheus.yml
+# ─────────────────────────────────────────────────────────────────────────────
+
+global:
+  scrape_interval:     15s   # how often to scrape targets
+  evaluation_interval: 15s   # how often to evaluate rules
+  external_labels:
+    project: 'greens-devops'
+    env:     'production'
+
+# ── Alerting (optional – connect to Alertmanager) ────────────────────────────
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['localhost:9093']
+
+# ── Alert rules file ──────────────────────────────────────────────────────────
+rule_files:
+  - "/etc/prometheus/alert.rules.yml"
+
+# ── Scrape jobs ───────────────────────────────────────────────────────────────
+scrape_configs:
+
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          instance: 'prometheus-server'
+
+  # EC2 system metrics (CPU, memory, disk, network)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+        labels:
+          instance: 'jenkins-ec2'
+
+  # Jenkins build metrics (requires Prometheus Metrics plugin in Jenkins)
+  - job_name: 'jenkins'
+    metrics_path: '/prometheus'
+    scheme: http
+    static_configs:
+      - targets: ['localhost:8080']
+        labels:
+          instance: 'jenkins'
+
+  # FastAPI application (Kubernetes pod metrics via NodePort or LoadBalancer)
+  # Update the target IP/port after deployment
+  - job_name: 'fastapi-app'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['localhost:80']
+        labels:
+          instance: 'fastapi-k8s'
+
+  # Kubernetes node metrics (if kube-state-metrics is installed)
+  # - job_name: 'kube-state-metrics'
+  #   static_configs:
+  #     - targets: ['<k8s-node-ip>:8080']
