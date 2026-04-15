@@ -3,11 +3,11 @@ pipeline {
 
     environment {
         SONARQUBE_SERVER = 'SonarQubeServer'
-        ECR_REPO         = '813270451126.dkr.ecr.ap-south-1.amazonaws.com/myrepo'
+        ECR_REPO         = '145400477094.dkr.ecr.ap-south-1.amazonaws.com/greens-devops-repo'
         AWS_REGION       = 'ap-south-1'
         IMAGE_NAME       = 'fastapi-app'
         PATH             = "/opt/sonar-scanner/bin:/usr/local/bin/terraform:$PATH"
-        NOTIFY_EMAIL     = 'shankygcpdevops@gmail.com'
+        NOTIFY_EMAIL     = 'ganeshtamizarasi@gmail.com'
         TF_DIR           = 'terraform'
     }
 
@@ -36,7 +36,7 @@ pipeline {
         stage('Pull Code From GitHub') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/shankysai/devopsproject170525.git'
+                    url: 'https://github.com/ganeshtamizarasi-hue/DEVOPS-PROJECT'
             }
         }
 
