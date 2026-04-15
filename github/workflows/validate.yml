@@ -1,0 +1,35 @@
+name: PR Validation
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+jobs:
+  terraform-check:
+    name: Terraform Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+      - run: cd terraform/ && terraform fmt -check -recursive
+      - run: cd terraform/ && terraform init -backend=false && terraform validate
+  python-lint:
+    name: Python Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install flake8 && flake8 main.py --max-line-length=100
+  dockerfile-lint:
+    name: Dockerfile Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          ignore: DL3008,DL3009
