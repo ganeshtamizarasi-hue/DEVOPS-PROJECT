@@ -1,4 +1,4 @@
-# 🚀 AWS DevOps CI/CD Pipeline — FastAPI on Kubernetes
+# 🚀 AWS DevOps CI/CD Pipeline 
 
 <div align="center">
 
@@ -13,7 +13,7 @@
 [![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?style=flat-square&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
 [![SonarQube](https://img.shields.io/badge/SonarQube-SAST-4E9BCD?style=flat-square&logo=sonarqube&logoColor=white)](https://www.sonarqube.org/)
 
-**Target: 8–10 LPA DevOps Engineer Role**
+
 
 </div>
 
@@ -137,7 +137,7 @@ Developer (Windows + PuTTY)
 ## 📁 Project Structure
 
 ```
-devops-fastapi-project/
+devops project/
 │
 ├── 📄 Dockerfile                    # Multi-stage build, non-root user, HEALTHCHECK
 ├── 📄 Jenkinsfile                   # 13-stage declarative pipeline
@@ -398,8 +398,5 @@ terraform destroy
 
 <div align="center">
 
-**Green's Technology — Velachery, Chennai**
-
-*Built with ❤️ for DevOps learners targeting 8–10 LPA roles*
 
 </div>
