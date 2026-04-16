@@ -1,5 +1,4 @@
-# AWS DevOps CI/CD Pipeline — FastAPI on Kubernetes
-
+# AWS DevOps CI/CD Pipeline — 
 <div align="center">
 
 ![Architecture Diagram](architecture.svg)
@@ -27,12 +26,9 @@
 - [Pipeline Stages](#pipeline-stages)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
-- [Screenshots](#screenshots)
 - [Service URLs](#service-urls)
 - [Monitoring & Alerts](#monitoring--alerts)
 - [Troubleshooting](#troubleshooting)
-- [Cleanup](#cleanup)
-
 ---
 
 ## Overview
@@ -70,7 +66,7 @@ All AWS infrastructure is provisioned with **Terraform** (IaC). Application metr
 ## Project Structure
 
 ```
-devops-fastapi-project/
+devops-project/
 │
 ├── architecture.svg              ← Architecture diagram (renders on GitHub)
 ├── Dockerfile                    ← Multi-stage build, non-root user, HEALTHCHECK
@@ -262,54 +258,6 @@ sudo chown -R jenkins:jenkins /var/lib/jenkins/.kube
 ```
 Jenkins → your pipeline → Build with Parameters → Build
 ```
-
----
-
-## Screenshots
-
-> After completing setup, take screenshots and save them in the `screenshots/` folder, then push to GitHub.
-
-### Jenkins Pipeline — All Stages Green
-![Jenkins Pipeline](screenshots/jenkins-pipeline.png)
-
-### SonarQube — Quality Gate Passed
-![SonarQube](screenshots/sonarqube-analysis.png)
-
-### Trivy — Image Security Scan Report
-![Trivy](screenshots/trivy-scan.png)
-
-### AWS ECR — Docker Image Pushed
-![ECR](screenshots/ecr-image.png)
-
-### Kubernetes — Pods Running
-![K8s Pods](screenshots/kubernetes-pods.png)
-
-### Prometheus — All Targets UP
-![Prometheus](screenshots/prometheus-targets.png)
-
-### Grafana — Live Dashboard
-![Grafana](screenshots/grafana-dashboard.png)
-
-### FastAPI — Live Application
-![App](screenshots/fastapi-app.png)
-
----
-
-### Screenshot Guide
-
-| Screenshot | Where to find it | Filename |
-|------------|-----------------|----------|
-| All stages green | Jenkins → pipeline → Stage View | `jenkins-pipeline.png` |
-| Quality Gate passed | SonarQube → Projects → your project | `sonarqube-analysis.png` |
-| CVE scan output | Jenkins → Build → Artifacts → trivy-report.txt | `trivy-scan.png` |
-| Image with tag | AWS Console → ECR → your repo | `ecr-image.png` |
-| `kubectl get pods` | PuTTY terminal output | `kubernetes-pods.png` |
-| Targets all UP | Prometheus → Status → Targets | `prometheus-targets.png` |
-| CPU/Memory panels | Grafana → your dashboard | `grafana-dashboard.png` |
-| Welcome page | http://LOAD-BALANCER-URL | `fastapi-app.png` |
-
-**How to add on Windows:** Press `Win + Shift + S` to snip → save as `.png` into `screenshots/` → commit and push.
-
 ---
 
 ## Service URLs
@@ -320,8 +268,6 @@ Jenkins → your pipeline → Build with Parameters → Build
 | SonarQube | `http://EC2-IP:9000` | admin / set on first run |
 | Prometheus | `http://EC2-IP:9090` | no login required |
 | Grafana | `http://EC2-IP:3000` | admin / Admin@123 |
-| FastAPI App | `http://LOAD-BALANCER-URL` | public |
-| Health Check | `http://LOAD-BALANCER-URL/health` | returns `{"status":"healthy"}` |
 
 ---
 
@@ -393,27 +339,6 @@ docker image prune -f
 | Grafana shows no data | Data source URL must be `http://localhost:9090` → click Save & Test |
 | SonarQube not loading | `docker logs sonarqube --tail=20` — wait 2 minutes after container start |
 | Smoke test fails | LoadBalancer takes 2–3 min to become active — pipeline retries automatically |
-
----
-
-## Cleanup
-
-> ⚠️ Running cost is approximately ₹1,500–2,500 per day with all resources active. Always stop resources after use.
-
-```bash
-# Step 1 — Delete Kubernetes cluster
-kops delete cluster \
-  --name=ganesh.k8s.local \
-  --state=s3://ganesh-kops-state \
-  --yes
-
-# Step 2 — Destroy Terraform resources
-cd ~/devops-fastapi-project/terraform
-terraform destroy
-
-# Step 3 — Stop EC2
-# AWS Console → EC2 → Instances → select → Instance state → Stop
-```
 
 ---
 
