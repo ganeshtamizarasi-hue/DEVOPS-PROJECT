@@ -1,9 +1,25 @@
-[README.md](https://github.com/user-attachments/files/26772942/README.md)
-# AWS DevOps CI/CD Pipeline
+# AWS DevOps CI/CD Pipeline 
 
-<div align="center">
+> **Stack:** Jenkins · SonarQube · Docker · Trivy · AWS ECR · Kubernetes (KOPS) · Terraform · Prometheus · Grafana 
+---
 
-![Architecture Diagram](architecture.svg)
+## Architecture
+
+```
+Developer → GitHub → Jenkins Pipeline
+                          │
+              ┌───────────┼───────────────┐
+              ▼           ▼               ▼
+         SonarQube    Docker Build     Terraform
+         (SAST)       + Trivy Scan     (Infra)
+                           │
+                      AWS ECR Push
+                           │
+                    Kubernetes Deploy
+                    (KOPS cluster)
+                           │
+                  Prometheus + Grafana
+                    (Monitoring)
 
 **Production-grade CI/CD pipeline on AWS**
 
@@ -32,7 +48,6 @@
 - [Service URLs](#service-urls)
 - [Monitoring & Alerts](#monitoring--alerts)
 - [Troubleshooting](#troubleshooting)
-- [Cleanup](#cleanup)
 
 ---
 
@@ -71,7 +86,7 @@ All AWS infrastructure is provisioned with **Terraform** (IaC). Application metr
 ## Project Structure
 
 ```
-devops-fastapi-project/
+devops-project/
 │
 ├── architecture.svg              ← Architecture diagram (renders on GitHub)
 ├── Dockerfile                    ← Multi-stage build, non-root user, HEALTHCHECK
@@ -277,9 +292,6 @@ Jenkins → your pipeline → Build with Parameters → Build
 | `kubectl get pods` | PuTTY terminal output | `kubernetes-pods.png` |
 | Targets all UP | Prometheus → Status → Targets | `prometheus-targets.png` |
 | CPU/Memory panels | Grafana → your dashboard | `grafana-dashboard.png` |
-| Welcome page | http://LOAD-BALANCER-URL | `fastapi-app.png` |
-
-**How to add on Windows:** Press `Win + Shift + S` to snip → save as `.png` into `screenshots/` → commit and push.
 
 ---
 
