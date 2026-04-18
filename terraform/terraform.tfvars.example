@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# terraform.tfvars  –  fill in your values, do NOT commit to git
+# terraform.tfvars-fill in your values, do NOT commit to git
 # Add this file to .gitignore
 # ─────────────────────────────────────────────────────────────────────────────
 
