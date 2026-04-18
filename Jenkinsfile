@@ -216,17 +216,19 @@ pipeline {
 }
 
         stage('Update Prometheus Target') {
-            steps {
-                sh '''
-                    LB=$(kubectl get svc fastapi-svc \
-                    -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+    steps {
+        sh '''
+        LB=$(kubectl get svc fastapi-svc \
+        -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
 
-                    sed -i "s|localhost:80|${LB}:80|g" /opt/prometheus/prometheus.yml
-                    curl -X POST http://localhost:9090/-/reload
-                '''
-            }
-        }
+        echo "Updating Prometheus target to $LB"
+
+        sudo sed -i "s|localhost:80|${LB}:80|g" /opt/prometheus/prometheus.yml
+
+        curl -X POST http://localhost:9090/-/reload
+        '''
     }
+}
 
     post {
         success {
