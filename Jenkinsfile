@@ -176,7 +176,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                    sed "s|_IMAGE_|${ECR_REPO}:${BUILD_NUMBER}|g" pod.yaml > deploy-final.yaml
+                    sed "s|_IMAGE_|${ECR_REPO}:${BUILD_NUMBER}|g" kubernetes/pod.yaml > deploy-final.yaml
                     kubectl apply -f deploy-final.yaml
                     kubectl rollout status deployment/fastapi-deployment --timeout=120s
                 '''
