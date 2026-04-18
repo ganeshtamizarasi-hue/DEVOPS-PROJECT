@@ -18,21 +18,14 @@ pipeline {
     }
 
     parameters {
-        booleanParam(
-            name:         'RUN_TERRAFORM',
-            defaultValue: false,
-            description:  'Apply Terraform changes? (only tick when infra has changed)'
-        )
-        booleanParam(
-            name:         'TERRAFORM_DESTROY',
-            defaultValue: false,
-            description:  'DANGER: destroy all Terraform-managed infrastructure'
-        )
+        booleanParam(name: 'RUN_TERRAFORM', defaultValue: false,
+            description: 'Apply Terraform changes?')
+        booleanParam(name: 'TERRAFORM_DESTROY', defaultValue: false,
+            description: 'Destroy infrastructure')
     }
 
     stages {
 
-        // ── 1. Pull source ────────────────────────────────────────────────
         stage('Pull Code From GitHub') {
             steps {
                 git branch: 'main',
@@ -40,7 +33,6 @@ pipeline {
             }
         }
 
-        // ── 2. Terraform Init ─────────────────────────────────────────────
         stage('Terraform Init') {
             when { expression { params.RUN_TERRAFORM || params.TERRAFORM_DESTROY } }
             steps {
@@ -56,7 +48,6 @@ pipeline {
             }
         }
 
-        // ── 3. Terraform Plan ─────────────────────────────────────────────
         stage('Terraform Plan') {
             when { expression { params.RUN_TERRAFORM } }
             steps {
@@ -70,14 +61,13 @@ pipeline {
             }
         }
 
-        // ── 4. Terraform Apply ────────────────────────────────────────────
         stage('Terraform Apply') {
             when { expression { params.RUN_TERRAFORM && !params.TERRAFORM_DESTROY } }
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                                   credentialsId: 'aws-creds']]) {
                     dir("${TF_DIR}") {
-                        sh 'terraform apply -input=false -auto-approve tfplan'
+                        sh 'terraform apply -auto-approve tfplan'
                         script {
                             env.ECR_REPO = sh(
                                 script: 'terraform output -raw ecr_repo_url',
@@ -89,31 +79,27 @@ pipeline {
             }
         }
 
-        // ── 5. Terraform Destroy (manual confirm) ─────────────────────────
         stage('Terraform Destroy') {
             when { expression { params.TERRAFORM_DESTROY } }
             steps {
-                input message: 'Are you SURE you want to destroy all infrastructure?', ok: 'Yes, destroy it'
+                input message: 'Are you sure?', ok: 'Yes'
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                                   credentialsId: 'aws-creds']]) {
                     dir("${TF_DIR}") {
-                        sh 'terraform destroy -input=false -auto-approve'
+                        sh 'terraform destroy -auto-approve'
                     }
                 }
             }
         }
 
-        // ── 6. Static code analysis ───────────────────────────────────────
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    sh "export PATH=\$PATH:${SONAR_PATH} && sonar-scanner"
+                    sh "sonar-scanner"
                 }
             }
         }
 
-
-        // ── 7. Quality Gate ───────────────────────────────────────────────
         stage('Quality Gate') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
@@ -122,7 +108,6 @@ pipeline {
             }
         }
 
-        // ── 8. Build Docker image ─────────────────────────────────────────
         stage('Build Docker Image') {
             steps {
                 sh '''
@@ -132,36 +117,40 @@ pipeline {
             }
         }
 
-
-        // ── 9. Trivy image security scan ──────────────────────────────────
         stage('Trivy Image Scan') {
             steps {
                 sh '''
                     trivy image --exit-code 0 --severity HIGH,CRITICAL \
-                        --format table ${IMAGE_NAME}:${BUILD_NUMBER} > trivy-report.txt
+                    ${IMAGE_NAME}:${BUILD_NUMBER} > trivy-report.txt
                     cat trivy-report.txt
                 '''
             }
-            post { always { archiveArtifacts artifacts: 'trivy-report.txt' } }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'trivy-report.txt'
+                }
+            }
         }
 
-
-        // ── 10. Push to AWS ECR ───────────────────────────────────────────
         stage('Push to ECR') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                                   credentialsId: 'aws-creds']]) {
                     sh '''
                         aws ecr get-login-password --region ${AWS_REGION} \
-                            | docker login --username AWS --password-stdin ${ECR_REPO}
+                        | docker login --username AWS --password-stdin ${ECR_REPO}
+
                         docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${ECR_REPO}:${BUILD_NUMBER}
                         docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${ECR_REPO}:latest
+
                         docker push ${ECR_REPO}:${BUILD_NUMBER}
                         docker push ${ECR_REPO}:latest
                     '''
                 }
             }
-        stage('Create ECR Secret') {    // ← NEW STAGE — fixes pull error
+        } 
+
+        stage('Create ECR Secret') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                                   credentialsId: 'aws-creds']]) {
@@ -170,90 +159,64 @@ pipeline {
                         kubectl create secret docker-registry ecr-secret \
                             --docker-server=${ECR_REPO} \
                             --docker-username=AWS \
-                            --docker-password=$(aws ecr get-login-password --region ${AWS_REGION}) \
-                            --namespace=default
+                            --docker-password=$(aws ecr get-login-password --region ${AWS_REGION})
                     '''
                 }
             }
         }
 
-        // ── 11. Deploy to Kubernetes ──────────────────────────────────────
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
                     sed "s|_IMAGE_|${ECR_REPO}:${BUILD_NUMBER}|g" \
-                        kubernetes/pod.yaml > deploy-final.yaml
+                    kubernetes/pod.yaml > deploy-final.yaml
+
                     kubectl apply -f deploy-final.yaml
-                    kubectl rollout status deployment/fastapi-deployment --timeout=300s
+                    kubectl rollout status deployment/fastapi-deployment
                 '''
             }
         }
 
-
-        // ── 12. Smoke test ────────────────────────────────────────────────
         stage('Smoke Test') {
             steps {
                 sh '''
                     sleep 30
                     LB=$(kubectl get svc fastapi-svc \
-                        -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-                    echo "Load Balancer: $LB"
-                    curl -sf http://${LB}/health && echo "PASSED" || echo "LB warming up"
+                    -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+                    curl -sf http://${LB}/health && echo "PASSED"
                 '''
             }
         }
- 
-    }
 
-
-        // ── 13. Update Prometheus scrape target with live LB host ─────────
         stage('Update Prometheus Target') {
             steps {
                 sh '''
-                    LB_HOST=$(kubectl get svc fastapi-svc \
-                        -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
-                    sed -i "s|localhost:80|${LB_HOST}:80|g" /opt/prometheus/prometheus.yml
-                    curl -sX POST http://localhost:9090/-/reload \
-                        && echo "Prometheus config reloaded" \
-                        || echo "Prometheus reload skipped"
+                    LB=$(kubectl get svc fastapi-svc \
+                    -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+
+                    sed -i "s|localhost:80|${LB}:80|g" /opt/prometheus/prometheus.yml
+                    curl -X POST http://localhost:9090/-/reload
                 '''
             }
         }
-
-    } // end stages
+    }
 
     post {
         success {
             mail to: "${NOTIFY_EMAIL}",
-                 subject: "SUCCESS: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                 body: """\
-Build #${env.BUILD_NUMBER} of ${env.JOB_NAME} completed successfully.
-
-Image pushed  : ${ECR_REPO}:${env.BUILD_NUMBER}
-Build URL     : ${env.BUILD_URL}
-Duration      : ${currentBuild.durationString}
-
-Monitoring:
-  Prometheus  : http://<EC2-IP>:9090
-  Grafana     : http://<EC2-IP>:3000  (admin / Admin@123)
-"""
+                 subject: "SUCCESS: ${env.JOB_NAME}",
+                 body: "Build success: ${env.BUILD_URL}"
         }
         failure {
             mail to: "${NOTIFY_EMAIL}",
-                 subject: "FAILURE: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                 body: """\
-Build #${env.BUILD_NUMBER} of ${env.JOB_NAME} has FAILED.
-
-Stage that failed : ${env.STAGE_NAME}
-Build URL         : ${env.BUILD_URL}
-Please check the console output for details.
-"""
+                 subject: "FAILED: ${env.JOB_NAME}",
+                 body: "Check logs: ${env.BUILD_URL}"
         }
         always {
             sh '''
                 docker rmi ${IMAGE_NAME}:${BUILD_NUMBER} || true
-                docker rmi ${IMAGE_NAME}:latest          || true
-                docker rmi ${ECR_REPO}:${BUILD_NUMBER}   || true
+                docker rmi ${IMAGE_NAME}:latest || true
+                docker rmi ${ECR_REPO}:${BUILD_NUMBER} || true
             '''
         }
     }
