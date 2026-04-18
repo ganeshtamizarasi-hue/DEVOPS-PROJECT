@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SONARQUBE_SERVER = 'SonarQubeServer'
-        ECR_REPO         = '145400477094.dkr.ecr.ap-south-1.amazonaws.com/greens-devops-repo'
+        ECR_REPO         = '145400477094.dkr.ecr.ap-south-1.amazonaws.com/ganesh-devops-repo'
         AWS_REGION       = 'ap-south-1'
         IMAGE_NAME       = 'fastapi-app'
         PATH             = "/opt/sonar-scanner/bin:/usr/local/bin/terraform:$PATH"
