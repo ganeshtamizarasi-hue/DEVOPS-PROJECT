@@ -178,15 +178,42 @@ pipeline {
         }
 
         stage('Smoke Test') {
-            steps {
-                sh '''
-                    sleep 30
-                    LB=$(kubectl get svc fastapi-svc \
-                    -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-                    curl -sf http://${LB}/health && echo "PASSED"
-                '''
-            }
-        }
+    steps {
+        sh '''
+        echo "Waiting for Load Balancer..."
+
+        # Wait until LB hostname is assigned
+        for i in {1..10}; do
+            LB=$(kubectl get svc fastapi-svc \
+            -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+
+            if [ ! -z "$LB" ]; then
+                echo "LB Found: $LB"
+                break
+            fi
+
+            echo "Waiting for LB..."
+            sleep 10
+        done
+
+        # Retry health check
+        for i in {1..10}; do
+            echo "Checking health... attempt $i"
+
+            if curl -sf http://${LB}/health; then
+                echo "PASSED"
+                exit 0
+            fi
+
+            echo "App not ready, retrying in 15s..."
+            sleep 15
+        done
+
+        echo "Smoke Test FAILED"
+        exit 1
+        '''
+    }
+}
 
         stage('Update Prometheus Target') {
             steps {
