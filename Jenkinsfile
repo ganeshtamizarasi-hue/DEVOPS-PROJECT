@@ -40,8 +40,8 @@ pipeline {
                                   credentialsId: 'aws-creds']]) {
                     dir("${TF_DIR}") {
                         sh '''
-                            terraform init -input=false
-                            terraform validate
+                        terraform init -input=false
+                        terraform validate
                         '''
                     }
                 }
@@ -95,7 +95,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    sh "sonar-scanner"
+                    sh 'sonar-scanner'
                 }
             }
         }
@@ -111,8 +111,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                    docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .
-                    docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${IMAGE_NAME}:latest
+                docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .
+                docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${IMAGE_NAME}:latest
                 '''
             }
         }
@@ -120,9 +120,9 @@ pipeline {
         stage('Trivy Image Scan') {
             steps {
                 sh '''
-                    trivy image --exit-code 0 --severity HIGH,CRITICAL \
-                    ${IMAGE_NAME}:${BUILD_NUMBER} > trivy-report.txt
-                    cat trivy-report.txt
+                trivy image --exit-code 0 --severity HIGH,CRITICAL \
+                ${IMAGE_NAME}:${BUILD_NUMBER} > trivy-report.txt
+                cat trivy-report.txt
                 '''
             }
             post {
@@ -137,29 +137,30 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                                   credentialsId: 'aws-creds']]) {
                     sh '''
-                        aws ecr get-login-password --region ${AWS_REGION} \
-                        | docker login --username AWS --password-stdin ${ECR_REPO}
+                    aws ecr get-login-password --region ${AWS_REGION} \
+                    | docker login --username AWS --password-stdin ${ECR_REPO}
 
-                        docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${ECR_REPO}:${BUILD_NUMBER}
-                        docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${ECR_REPO}:latest
+                    docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${ECR_REPO}:${BUILD_NUMBER}
+                    docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${ECR_REPO}:latest
 
-                        docker push ${ECR_REPO}:${BUILD_NUMBER}
-                        docker push ${ECR_REPO}:latest
+                    docker push ${ECR_REPO}:${BUILD_NUMBER}
+                    docker push ${ECR_REPO}:latest
                     '''
                 }
             }
-        } 
+        }
 
         stage('Create ECR Secret') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                                   credentialsId: 'aws-creds']]) {
                     sh '''
-                        kubectl delete secret ecr-secret --ignore-not-found=true
-                        kubectl create secret docker-registry ecr-secret \
-                            --docker-server=${ECR_REPO} \
-                            --docker-username=AWS \
-                            --docker-password=$(aws ecr get-login-password --region ${AWS_REGION})
+                    kubectl delete secret ecr-secret --ignore-not-found=true
+
+                    kubectl create secret docker-registry ecr-secret \
+                    --docker-server=${ECR_REPO} \
+                    --docker-username=AWS \
+                    --docker-password=$(aws ecr get-login-password --region ${AWS_REGION})
                     '''
                 }
             }
@@ -168,67 +169,65 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                    sed "s|_IMAGE_|${ECR_REPO}:${BUILD_NUMBER}|g" \
-                    kubernetes/pod.yaml > deploy-final.yaml
+                sed "s|_IMAGE_|${ECR_REPO}:${BUILD_NUMBER}|g" \
+                kubernetes/pod.yaml > deploy-final.yaml
 
-                    kubectl apply -f deploy-final.yaml
-                    kubectl rollout status deployment/fastapi-deployment
+                kubectl apply -f deploy-final.yaml
+                kubectl rollout status deployment/fastapi-deployment
                 '''
             }
         }
 
         stage('Smoke Test') {
-    steps {
-        sh '''
-        echo "Waiting for Load Balancer..."
+            steps {
+                sh '''
+                echo "Waiting for Load Balancer..."
 
-        # Wait until LB hostname is assigned
-        for i in {1..10}; do
-            LB=$(kubectl get svc fastapi-svc \
-            -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+                for i in {1..10}; do
+                    LB=$(kubectl get svc fastapi-svc \
+                    -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
 
-            if [ ! -z "$LB" ]; then
-                echo "LB Found: $LB"
-                break
-            fi
+                    if [ ! -z "$LB" ]; then
+                        echo "LB Found: $LB"
+                        break
+                    fi
 
-            echo "Waiting for LB..."
-            sleep 10
-        done
+                    sleep 10
+                done
 
-        # Retry health check
-        for i in {1..10}; do
-            echo "Checking health... attempt $i"
+                for i in {1..10}; do
+                    echo "Checking health... attempt $i"
 
-            if curl -sf http://${LB}/health; then
-                echo "PASSED"
-                exit 0
-            fi
+                    if curl -sf http://${LB}/health; then
+                        echo "PASSED"
+                        exit 0
+                    fi
 
-            echo "App not ready, retrying in 15s..."
-            sleep 15
-        done
+                    sleep 15
+                done
 
-        echo "Smoke Test FAILED"
-        exit 1
-        '''
-    }
-}
+                echo "Smoke Test FAILED"
+                exit 1
+                '''
+            }
+        }
 
         stage('Update Prometheus Target') {
-    steps {
-        sh '''
-        LB=$(kubectl get svc fastapi-svc \
-        -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+            steps {
+                sh '''
+                LB=$(kubectl get svc fastapi-svc \
+                -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
 
-        echo "Updating Prometheus target to $LB"
+                echo "Updating Prometheus target to $LB"
 
-        sudo sed -i "s|localhost:80|${LB}:80|g" /opt/prometheus/prometheus.yml
+                sudo sed -i "s|localhost:80|${LB}:80|g" /opt/prometheus/prometheus.yml
 
-        curl -X POST http://localhost:9090/-/reload
-        '''
-    }
-}
+                curl -X POST http://localhost:9090/-/reload
+                '''
+            }
+        }
+
+    } // ✅ stages closed properly
 
     post {
         success {
@@ -243,9 +242,9 @@ pipeline {
         }
         always {
             sh '''
-                docker rmi ${IMAGE_NAME}:${BUILD_NUMBER} || true
-                docker rmi ${IMAGE_NAME}:latest || true
-                docker rmi ${ECR_REPO}:${BUILD_NUMBER} || true
+            docker rmi ${IMAGE_NAME}:${BUILD_NUMBER} || true
+            docker rmi ${IMAGE_NAME}:latest || true
+            docker rmi ${ECR_REPO}:${BUILD_NUMBER} || true
             '''
         }
     }
