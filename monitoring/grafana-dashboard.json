@@ -11,8 +11,8 @@
     { "type": "datasource", "id": "prometheus", "version": "1.0.0" },
     { "type": "grafana",    "id": "grafana",    "version": "10.0.0" }
   ],
-  "title": "Green's DevOps – Project Dashboard",
-  "uid":   "greens-devops-01",
+  "title": "Ganesh DevOps – Project Dashboard",
+  "uid":   "ganesh-devops-01",
   "schemaVersion": 38,
   "version": 1,
   "refresh": "30s",

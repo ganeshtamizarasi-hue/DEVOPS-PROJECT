@@ -15,7 +15,7 @@ terraform {
 
   # Store state remotely so the team shares the same state
   backend "s3" {
-    bucket         = "greens-tf-state-bucket"      # change to your bucket
+    bucket         = "ganesh-tf-state-bucket"      # change to your bucket
     key            = "devops-project/terraform.tfstate"
     region         = "ap-south-1"
     encrypt        = true
@@ -242,7 +242,7 @@ resource "aws_ecr_lifecycle_policy" "app" {
 
 # ── S3 bucket for Terraform state (bootstrap separately if needed) ─────────────
 resource "aws_s3_bucket" "tf_state" {
-  bucket = "greens-tf-state-bucket"
+  bucket = "ganesh-tf-state-bucket"
   tags   = merge(local.common_tags, { Name = "tf-state" })
 }
 

@@ -7,7 +7,7 @@ global:
   scrape_interval:     15s   # how often to scrape targets
   evaluation_interval: 15s   # how often to evaluate rules
   external_labels:
-    project: 'greens-devops'
+    project: 'ganesh-devops'
     env:     'production'
 
 # ── Alerting (optional – connect to Alertmanager) ────────────────────────────

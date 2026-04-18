@@ -11,7 +11,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "Prefix used on all resource names and tags"
   type        = string
-  default     = "greens-devops"
+  default     = "ganesh-devops"
 }
 
 variable "vpc_cidr" {

@@ -7,6 +7,6 @@ locals {
     Project     = var.project_name
     Environment = "dev"
     ManagedBy   = "Terraform"
-    Owner       = "greens-technology"
+    Owner       = "ganesh-devops"
   }
 }

@@ -11,9 +11,9 @@ RUN pip install --no-cache-dir --upgrade pip \
 # ── Stage 2: lean runtime image ──────────────────────────────────────────────
 FROM python:3.11-slim
 
-LABEL maintainer="devops@greenstechnology.com" \
+LABEL maintainer="devops@ganesh.com" \
       version="1.0" \
-      description="FastAPI application – Green's Technology"
+      description="FastAPI application – ganesh"
 
 # Non-root user for security (no privilege escalation)
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser

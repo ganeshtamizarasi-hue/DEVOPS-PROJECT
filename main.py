@@ -3,7 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
 
 app = FastAPI(
-    title="Green's Technology FastAPI App",
+    title="Ganesh FastAPI App",
     description="DevOps CI/CD demo – FastAPI on Kubernetes",
     version="1.0.0",
 )
