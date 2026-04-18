@@ -219,15 +219,17 @@ pipeline {
                 -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
 
                 echo "Updating Prometheus target to $LB"
+                
+                sudo chown -R jenkins:jenkins /opt/prometheus
 
-                sudo sed -i "s|localhost:80|${LB}:80|g" /opt/prometheus/prometheus.yml
+                sed -i "s|localhost:80|${LB}:80|g" /opt/prometheus/prometheus.yml
 
                 curl -X POST http://localhost:9090/-/reload
                 '''
             }
         }
 
-    } // ✅ stages closed properly
+    }
 
     post {
         success {
