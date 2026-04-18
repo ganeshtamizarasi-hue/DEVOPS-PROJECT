@@ -14,7 +14,6 @@ spec:
       protocol: TCP
       port: 80
       targetPort: 80
-
 ---
 # ── Deployment ────────────────────────────────────────────────────────────────
 apiVersion: apps/v1
@@ -32,20 +31,20 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 0          # zero-downtime deploy
+      maxUnavailable: 0
   template:
     metadata:
       labels:
         app: fastapi
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
         - name: fastapi
           image: _IMAGE_
           imagePullPolicy: Always
           ports:
             - containerPort: 80
-
-          # Resource requests and limits
           resources:
             requests:
               cpu: "100m"
@@ -53,8 +52,6 @@ spec:
             limits:
               cpu: "500m"
               memory: "256Mi"
-
-          # Liveness probe – restart the pod if the app hangs
           livenessProbe:
             httpGet:
               path: /
@@ -62,8 +59,6 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 20
             failureThreshold: 3
-
-          # Readiness probe – only send traffic when the app is ready
           readinessProbe:
             httpGet:
               path: /
@@ -71,15 +66,10 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 3
-
-          # Environment variables
           env:
             - name: APP_ENV
               value: "production"
-
-      # Graceful shutdown
       terminationGracePeriodSeconds: 30
-
 ---
 # ── Horizontal Pod Autoscaler ─────────────────────────────────────────────────
 apiVersion: autoscaling/v2
