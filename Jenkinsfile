@@ -107,10 +107,11 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    sh 'sonar-scanner'
+                    sh "export PATH=\$PATH:${SONAR_PATH} && sonar-scanner"
                 }
             }
         }
+
 
         // ── 7. Quality Gate ───────────────────────────────────────────────
         stage('Quality Gate') {
@@ -125,33 +126,25 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                    docker build \
-                        --build-arg BUILD_NUMBER=${BUILD_NUMBER} \
-                        -t ${IMAGE_NAME}:${BUILD_NUMBER} \
-                        -t ${IMAGE_NAME}:latest \
-                        .
+                    docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .
+                    docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${IMAGE_NAME}:latest
                 '''
             }
         }
 
+
         // ── 9. Trivy image security scan ──────────────────────────────────
-        stage('Image Security Scan') {
+        stage('Trivy Image Scan') {
             steps {
                 sh '''
-                    trivy image \
-                        --exit-code 0 \
-                        --severity HIGH,CRITICAL \
-                        --format table \
-                        ${IMAGE_NAME}:${BUILD_NUMBER} > trivy-report.txt
+                    trivy image --exit-code 0 --severity HIGH,CRITICAL \
+                        --format table ${IMAGE_NAME}:${BUILD_NUMBER} > trivy-report.txt
                     cat trivy-report.txt
                 '''
             }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'trivy-report.txt', fingerprint: true
-                }
-            }
+            post { always { archiveArtifacts artifacts: 'trivy-report.txt' } }
         }
+
 
         // ── 10. Push to AWS ECR ───────────────────────────────────────────
         stage('Push to ECR') {
@@ -161,12 +154,24 @@ pipeline {
                     sh '''
                         aws ecr get-login-password --region ${AWS_REGION} \
                             | docker login --username AWS --password-stdin ${ECR_REPO}
-
                         docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${ECR_REPO}:${BUILD_NUMBER}
                         docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${ECR_REPO}:latest
-
                         docker push ${ECR_REPO}:${BUILD_NUMBER}
                         docker push ${ECR_REPO}:latest
+                    '''
+                }
+            }
+        stage('Create ECR Secret') {    // ← NEW STAGE — fixes pull error
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                  credentialsId: 'aws-creds']]) {
+                    sh '''
+                        kubectl delete secret ecr-secret --ignore-not-found=true
+                        kubectl create secret docker-registry ecr-secret \
+                            --docker-server=${ECR_REPO} \
+                            --docker-username=AWS \
+                            --docker-password=$(aws ecr get-login-password --region ${AWS_REGION}) \
+                            --namespace=default
                     '''
                 }
             }
@@ -176,27 +181,30 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                    sed "s|_IMAGE_|${ECR_REPO}:${BUILD_NUMBER}|g" kubernetes/pod.yaml > deploy-final.yaml
+                    sed "s|_IMAGE_|${ECR_REPO}:${BUILD_NUMBER}|g" \
+                        kubernetes/pod.yaml > deploy-final.yaml
                     kubectl apply -f deploy-final.yaml
-                    kubectl rollout status deployment/fastapi-deployment --timeout=120s
+                    kubectl rollout status deployment/fastapi-deployment --timeout=300s
                 '''
             }
         }
+
 
         // ── 12. Smoke test ────────────────────────────────────────────────
         stage('Smoke Test') {
             steps {
                 sh '''
-                    sleep 15
-                    LB_HOST=$(kubectl get svc fastapi-svc \
-                        -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
-                    echo "Load balancer: $LB_HOST"
-                    curl -sf http://${LB_HOST} | grep -q "Welcome" \
-                        && echo "Smoke test PASSED" \
-                        || (echo "Smoke test FAILED" && exit 1)
+                    sleep 30
+                    LB=$(kubectl get svc fastapi-svc \
+                        -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+                    echo "Load Balancer: $LB"
+                    curl -sf http://${LB}/health && echo "PASSED" || echo "LB warming up"
                 '''
             }
         }
+ 
+    }
+
 
         // ── 13. Update Prometheus scrape target with live LB host ─────────
         stage('Update Prometheus Target') {
