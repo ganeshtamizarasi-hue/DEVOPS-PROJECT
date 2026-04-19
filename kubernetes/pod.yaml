@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: fastapi-svc
+  name: devops-showcase-svc
   labels:
-    app: fastapi
+    app: devops-showcase
 spec:
   type: LoadBalancer
   selector:
-    app: fastapi
+    app: devops-showcase
   ports:
     - name: http
       protocol: TCP
@@ -17,14 +17,14 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fastapi-deployment
+  name: devops-showcase-deployment
   labels:
-    app: fastapi
+    app: devops-showcase
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: fastapi
+      app: devops-showcase
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -33,12 +33,12 @@ spec:
   template:
     metadata:
       labels:
-        app: fastapi
+        app: devops-showcase
     spec:
       imagePullSecrets:
         - name: ecr-secret      # ← THIS WAS MISSING BEFORE
       containers:
-        - name: fastapi
+        - name: devops-showcase
           image: _IMAGE_
           imagePullPolicy: Always
           ports:
@@ -69,12 +69,12 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: fastapi-hpa
+  name: devops-showcase-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: fastapi-deployment
+    name: devops-showcase-deployment
   minReplicas: 2
   maxReplicas: 6
   metrics:

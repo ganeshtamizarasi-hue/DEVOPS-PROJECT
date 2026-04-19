@@ -5,7 +5,7 @@ pipeline {
         SONARQUBE_SERVER = 'SonarQubeServer'
         ECR_REPO         = '145400477094.dkr.ecr.ap-south-1.amazonaws.com/ganesh-devops-repo'
         AWS_REGION       = 'ap-south-1'
-        IMAGE_NAME       = 'fastapi-app'
+        IMAGE_NAME       = 'devops-showcase'
         PATH             = "/opt/sonar-scanner/bin:/usr/local/bin/terraform:$PATH"
         NOTIFY_EMAIL     = 'ganeshtamizarasi@gmail.com'
         TF_DIR           = 'terraform'
@@ -173,7 +173,7 @@ pipeline {
                 kubernetes/pod.yaml > deploy-final.yaml
 
                 kubectl apply -f deploy-final.yaml
-                kubectl rollout status deployment/fastapi-deployment
+                kubectl rollout status deployment/devops-showcase-deployment
                 '''
             }
         }
@@ -184,7 +184,7 @@ pipeline {
                 echo "Waiting for Load Balancer..."
 
                 for i in {1..10}; do
-                    LB=$(kubectl get svc fastapi-svc \
+                    LB=$(kubectl get svc devops-showcase-svc \
                     -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
 
                     if [ ! -z "$LB" ]; then
@@ -215,7 +215,7 @@ pipeline {
         stage('Update Prometheus Target') {
             steps {
                 sh '''
-                LB=$(kubectl get svc fastapi-svc \
+                LB=$(kubectl get svc devops-showcase-svc \
                 -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
 
                 echo "Updating Prometheus target to $LB"
