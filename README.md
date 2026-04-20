@@ -1,4 +1,4 @@
-# AWS DevOps CI/CD Pipeline — 
+# AWS DevOps CI/CD Pipeline 
 <div align="center">
 
 ![Architecture Diagram](architecture.svg)
@@ -59,7 +59,6 @@ All AWS infrastructure is provisioned with **Terraform** (IaC). Application metr
 | Terraform | IaC — VPC, EC2, ECR, IAM, S3, DynamoDB | — |
 | Prometheus | Metrics scraping — Jenkins, Node Exporter, App | 9090 |
 | Grafana | Live dashboards + alerting | 3000 |
-| FastAPI | Python web application — `/` and `/health` endpoints | 80 |
 
 ---
 
@@ -279,7 +278,7 @@ Jenkins → your pipeline → Build with Parameters → Build
 |-----|--------|---------|
 | `jenkins` | `localhost:8080/prometheus` | Build count, duration, queue length |
 | `node-exporter` | `localhost:9100` | CPU, Memory, Disk, Network |
-| `fastapi-app` | `LOAD-BALANCER:80` | App health, uptime |
+| `devops-showcase` | `LOAD-BALANCER:80` | App health, uptime |
 
 ### Grafana Dashboards
 
